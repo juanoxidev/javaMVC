@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" version="4.0">
+  <display-name>javaMVC</display-name>
+  <welcome-file-list>
+<!--   Toda aplicación JEE deben tener un deployment descriptor, es un archivo xml que le indica a nuestra app cómo debe arrancar. En Deployment Descriptor hacemos click derecho y seleccionamos Generete Deployment descriptor Stub, esto hace que se cree el archivo web.xml en la carpeta WEB-INF el cual va a contener las rutas de bienvenida de nuestra APP -->
+ <!--  nos dirigimos por primera vez a nuestro controladorProductos -->
+  <welcome-file>ControladorProductos</welcome-file>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

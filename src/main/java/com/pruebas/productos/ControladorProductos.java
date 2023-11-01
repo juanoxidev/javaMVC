@@ -1,6 +1,7 @@
 package com.pruebas.productos;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,20 +53,114 @@ public class ControladorProductos extends HttpServlet {
 		String elComando = request.getParameter("instruccion");
 		// Si no se envia el parametro, listar productos
 		if (elComando == null) {
-			elComando = "listar";
+			elComando = "listarProducto";
 		}
 		// Redirigir el flujo de ejecucion al metodo adecuado.
 		switch (elComando) {
-		case "listar":
+		case "listarProducto":
 			obtenerProductos(request, response);
 			break;
 		case "insertarBBDD":
 			agregarProducto(request, response);
+			break;
+		case "traerProducto":
+			try {
+				traerProducto(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		case "actualizarBBDD":
+			try {
+				actualizarProducto(request, response);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+		case "eliminarProducto":
+			try {
+				eliminarProducto(request, response);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
 		default:
 			obtenerProductos(request, response);
 		}
 
 
+	}
+
+
+
+	private void eliminarProducto(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// Capturar el codigo de articulo
+		String codArticulo = request.getParameter("CArticulo");
+		
+		
+		
+		// Borrar producto de la BBDD 
+		
+		
+		this.modeloProductos.eliminarProducto(codArticulo);
+		
+		
+		// Volver a la lista de productos
+		
+		obtenerProductos(request,response);
+		
+		
+	}
+
+
+
+	private void actualizarProducto(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// Leer los datos que le vienen del formulario de actualizar  
+
+		String codArticulo = request.getParameter("cArt");
+		String seccion = request.getParameter("seccion");
+		String nombreArticulo = request.getParameter("nArt");
+		// SimpleDateFormat define el formato de la fecha String
+		SimpleDateFormat formatoFecha= new SimpleDateFormat("yyyy-MM-dd");
+		Date fecha= null;
+		// Le pasamos a la fecha Date el parametro String y lo parseamos con el metodo .parse que retorna un Date por el SimpleDateFormat
+		try {
+			fecha = formatoFecha.parse(request.getParameter("fecha"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		double precio = Double.parseDouble(request.getParameter("precio"));
+		String importado = request.getParameter("importado");
+		String paisOrigen = request.getParameter("pOrigen");
+		//Crear un objeto de tipo Producto.
+		Productos productoActualizado = new Productos(codArticulo, seccion, nombreArticulo, precio, fecha, importado,
+				paisOrigen);
+		//Actualizar la BBDD con la info del objeto producto 
+		modeloProductos.actualizarProducto(productoActualizado);
+		//Volver el listado con la info actualizada
+		obtenerProductos(request,response);
+		
+	}
+
+
+
+	private void traerProducto(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		// Leer el codigo articulo que viene del listado
+		String codigoArticulo=request.getParameter("CArticulo");
+		// comunicar con el modelo para que aquel haga una consulta a la BBDD sobre el codigo del articulo que le pasamos y que el modelo nos lo retorne
+		Productos productoAModificar = this.modeloProductos.getProducto(codigoArticulo);
+		// Colocar atributos al C articulo
+		request.setAttribute("PRODUCTO", productoAModificar);
+		//Enviar producto con toda su informacion al formulario de actualizar .jsp
+		// REQUEST DISPATCHER
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/actualizarProducto.jsp");
+		dispatcher.forward(request, response);
+		
+	
 	}
 
 
@@ -98,7 +193,12 @@ public class ControladorProductos extends HttpServlet {
 
 		// Enviar el objeto al modelo y despues insertar el Producto en la BBDD
 		System.out.println(nuevoProducto);
-		modeloProductos.agregarNuevoProducto(nuevoProducto);
+		try {
+			modeloProductos.agregarNuevoProducto(nuevoProducto);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// Volver al listado de Productos
 
 		obtenerProductos(request,response);
