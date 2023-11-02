@@ -24,30 +24,30 @@ public class ModeloProductos {
 		Connection miConexion = null;
 		Statement miStatement = null;
 		ResultSet miResultSet = null;
-try {
-		// Establecer la conexion
-		miConexion = origenDatos.getConnection();
-		// Crear la sentencia SQL y Statement
-		String sentenciaSql = "SELECT * FROM productos";
-		miStatement = miConexion.createStatement();
-		// Ejecutar sentenciaSQL
-		miResultSet = miStatement.executeQuery(sentenciaSql);
-		// Recorrer el ResultSet
-		while(miResultSet.next()) {
-			String c_art = miResultSet.getString("CodigoArticulo");
-			String seccion = miResultSet.getString("Seccion");
-			String n_art = miResultSet.getString("NombreArticulo");
-			double precio = miResultSet.getDouble("Precio");
-			Date fecha = miResultSet.getDate("Fecha");
-			String importado = miResultSet.getString("Importado");
-			String p_orig = miResultSet.getString("PaisDeOrigen");
-			productos.add(new Productos(c_art,seccion,n_art,precio,fecha,importado,p_orig));
+		try {
+			// Establecer la conexion
+			miConexion = origenDatos.getConnection();
+			// Crear la sentencia SQL y Statement
+			String sentenciaSql = "SELECT * FROM productos";
+			miStatement = miConexion.createStatement();
+			// Ejecutar sentenciaSQL
+			miResultSet = miStatement.executeQuery(sentenciaSql);
+			// Recorrer el ResultSet
+			while(miResultSet.next()) {
+				String c_art = miResultSet.getString("CodigoArticulo");
+				String seccion = miResultSet.getString("Seccion");
+				String n_art = miResultSet.getString("NombreArticulo");
+				double precio = miResultSet.getDouble("Precio");
+				Date fecha = miResultSet.getDate("Fecha");
+				String importado = miResultSet.getString("Importado");
+				String p_orig = miResultSet.getString("PaisDeOrigen");
+				productos.add(new Productos(c_art,seccion,n_art,precio,fecha,importado,p_orig));
 
+			}
+		} 	finally {
+			miStatement.close();
+			miConexion.close();
 		}
-} 	finally {
-	miStatement.close();
-	miConexion.close();
-}
 		return productos;
 
 
@@ -103,9 +103,9 @@ try {
 		Connection miConexion = null;
 		PreparedStatement miStatement = null;
 		ResultSet miResultSet = null;
-		String cArticulo=codigoArticulo;
-		
-		
+
+
+
 		try {
 			// Establecer la conxecion con la BBDD
 			miConexion=origenDatos.getConnection();
@@ -114,9 +114,9 @@ try {
 			// Crear la consulta preparada
 			miStatement=miConexion.prepareStatement(sqlBusquedad);
 			//establecer los parametros
-			miStatement.setString(1, cArticulo);
+			miStatement.setString(1, codigoArticulo);
 			//ejecutar la consulta
-			miStatement.executeQuery();
+			miResultSet = miStatement.executeQuery();
 			//obtenr los datos de respuesta
 			if(miResultSet.next()) {
 				String c_art = miResultSet.getString("CodigoArticulo");
@@ -130,7 +130,7 @@ try {
 				productoAModificar = new Productos(c_art,seccion,n_art,precio,fecha,importado,p_orig);
 			} else {
 				// si no hay ningun registroe en el ResultSet lanzamos un error
-				throw new Exception("No hemos encontrado el producto con codigo articulo : " + cArticulo);
+				throw new Exception("No hemos encontrado el producto con codigo articulo : " + codigoArticulo);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -139,50 +139,50 @@ try {
 			miStatement.close();
 			miConexion.close();
 		}
-		
+
 		return productoAModificar;
 	}
 
 	public void actualizarProducto(Productos productoActualizado) throws Exception{
 		Connection miConexion = null;
 		PreparedStatement miStatement = null;
-	try {
-		// Estalecer la conexion
-	miConexion=origenDatos.getConnection();
-		//Crear Sentencia SQL
-		
-		String UpdateSql="UPDATE productos SET Seccion=?,NombreArticulo=?,Precio=?,Fecha=?,Importado=?,PaisDeOrigen=? WHERE CodigoArticulo=?";
-		// Crear la consulta preparada
-		miStatement = miConexion.prepareStatement(UpdateSql);
-		// Establecer los parametros
-		miStatement.setString(1, productoActualizado.getSeccion());
-		miStatement.setString(2, productoActualizado.getnArt());
-		miStatement.setDouble(3, productoActualizado.getPrecio());
-		// el date que tenemos es del paquete java.util y el que se usa con los statment
-		// es el date del paquete java.sql
-		// tenemos que convertir ese date de java.util a uno de java.sql, la diferencia
-		// de uno a otro es que el primero tiene fecha y hora y el segundo solo tiene
-		// fecha
+		try {
+			// Estalecer la conexion
+			miConexion=origenDatos.getConnection();
+			//Crear Sentencia SQL
 
-		java.util.Date utilDate = productoActualizado.getFecha();
-		java.sql.Date fechaSQL = new java.sql.Date(utilDate.getTime());
-		miStatement.setDate(4, fechaSQL);
+			String UpdateSql="UPDATE productos SET Seccion=?,NombreArticulo=?,Precio=?,Fecha=?,Importado=?,PaisDeOrigen=? WHERE CodigoArticulo=?";
+			// Crear la consulta preparada
+			miStatement = miConexion.prepareStatement(UpdateSql);
+			// Establecer los parametros
+			miStatement.setString(1, productoActualizado.getSeccion());
+			miStatement.setString(2, productoActualizado.getnArt());
+			miStatement.setDouble(3, productoActualizado.getPrecio());
+			// el date que tenemos es del paquete java.util y el que se usa con los statment
+			// es el date del paquete java.sql
+			// tenemos que convertir ese date de java.util a uno de java.sql, la diferencia
+			// de uno a otro es que el primero tiene fecha y hora y el segundo solo tiene
+			// fecha
 
-		miStatement.setString(5, productoActualizado.getImportado());
-		miStatement.setString(6, productoActualizado.getpOrigen());
-		miStatement.setString(7, productoActualizado.getcArt());
-		//Ejecutar la instruccion SQL
-		miStatement.execute();
-	} finally {
-		miStatement.close();
-		miConexion.close();
-	}
+			java.util.Date utilDate = productoActualizado.getFecha();
+			java.sql.Date fechaSQL = new java.sql.Date(utilDate.getTime());
+			miStatement.setDate(4, fechaSQL);
+
+			miStatement.setString(5, productoActualizado.getImportado());
+			miStatement.setString(6, productoActualizado.getpOrigen());
+			miStatement.setString(7, productoActualizado.getcArt());
+			//Ejecutar la instruccion SQL
+			miStatement.execute();
+		} finally {
+			miStatement.close();
+			miConexion.close();
+		}
 	}
 	public void eliminarProducto(String codArticulo) throws SQLException {
-		
+
 		Connection miConexion = null;
 		PreparedStatement miStatement = null;
-		
+
 		try {
 			// Establecer la conexion con BBDD
 			miConexion=origenDatos.getConnection();
@@ -195,8 +195,8 @@ try {
 			// Ejecutar instruccion sql.
 			miStatement.execute();
 			//cerrar conexion
-			
-			
+
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -204,7 +204,7 @@ try {
 			miStatement.close();
 			miConexion.close();
 		}
-	
-		
+
+
 	}
 }
